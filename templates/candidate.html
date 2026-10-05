@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block nav %}{% if p.registered %}<a class="pill" href="{{ url_for('my_result') }}">Natija</a>{% endif %}<a class="pill" id="exit" href="{{ url_for('logout') }}">Chiqish</a>{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div class="row" style="justify-content:space-between;flex-wrap:wrap">
+    <div><div class="eyebrow">Ishtirokchi</div><h1 style="font-size:36px">{{ p.ism }} {{ p.familya }}</h1><div class="muted">{{ p.yonalish }}</div></div>
+    <div id="status" class="badge wait"></div>
+  </div>
+  <div class="grid2" style="grid-template-columns:1.5fr 1fr;align-items:start">
+    <div class="card stack" id="main" style="gap:24px"></div>
+    <div class="card stack">
+      <h2 style="font-size:24px">Savollar</h2>
+      <div id="dots" class="stack" style="gap:10px"><span class="muted">Savollar suhbat boshlangach ko'rinadi.</span></div>
+      <div id="judges" class="muted"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let busy=false;
+async function post(url,body){
+  if(busy)return;busy=true;
+  const r=await api(url,{method:"POST",headers:body?{"Content-Type":"application/json"}:undefined,body:body?JSON.stringify(body):undefined});
+  if(!r.ok){const j=await r.json();alert(j.error)}
+  busy=false;load();
+}
+async function load(){
+  const s=await (await api("/api/holat")).json();
+  const box=$("main"),st=$("status"),j=$("judges"),dots=$("dots");
+  box.replaceChildren();dots.replaceChildren();j.textContent="";
+  $("exit").onclick=(s.finished||s.closed)?null:()=>confirm("Savol-javob oxiriga yetmadi. Chiqsangiz suhbat yopiladi va qayta kirib bo'lmaydi. Chiqasizmi?");
+  const total=s.total||0;
+  const hasCur=!!s.current;
+  (s.questions||[]).forEach(q=>{
+    if(q.text==null)return;
+    const row=el("div","row");row.style.cssText="flex-wrap:nowrap;align-items:flex-start;gap:10px";
+    row.append(el("span","badge "+(q.status==="done"?"ok":"wait"),q.ord),el("span",q.status==="current"?"":"muted",q.text));
+    dots.append(row)});
+  if(!dots.children.length)dots.append(el("span","muted","Savollar suhbat boshlangach ko'rinadi."));
+  if(s.closed){
+    st.className="badge wait";st.textContent="Suhbat yopilgan";
+    box.append(el("h2","","Suhbat yopilgan"),el("p","muted","Admin suhbatni yopdi."));
+    const a=el("a","btn","Natijani ko'rish");a.href="{{ url_for('my_result') }}";box.append(a);return}
+  if(s.finished){
+    st.className="badge ok";st.textContent="Suhbat yakunlandi";
+    box.append(el("h2","","Suhbat yakunlandi"),el("p","muted","Barcha savollar baholandi. Natijangizni, to'g'ri javoblarni ko'rishingiz va PDF qilib yuklab olishingiz mumkin."));
+    const a=el("a","btn","Natijani ko'rish");a.href="{{ url_for('my_result') }}";box.append(a);return}
+  if(s.participant.status==="waiting"){
+    st.className="badge wait";st.textContent="Boshlashga tayyor";
+    box.append(el("h2","","Tayyorsiz"),el("p","muted","Tayyor bo'lgach tugmani bosing. Savollar hakamlarga ham ko'rinadi."));
+    const b=el("button","btn","Savol-javobni boshlash");b.type="button";b.disabled=!s.can_start;b.onclick=()=>post("/api/boshlash");box.append(b);
+    if(!s.can_start)box.append(el("div","badge wait","Sizdan oldin "+s.ahead+" ta ishtirokchi bor. Navbatingizni kuting."));
+    return}
+  if(s.current){
+    st.className="badge wait";st.textContent="Savol "+s.current.ord+" / "+total;
+    box.append(el("div","muted","Savol "+s.current.ord+" / "+total),el("div","big",s.current.text));
+    box.append(el("p","muted","Javobingizni hakamlarga ayting. Vaqt: 1 minut."));
+    j.textContent=s.current.scored+" / "+s.n_judges+" hakam baho qo'ydi";
+    return}
+  st.className="badge wait";st.textContent="Savol tanlang";
+  box.append(el("h2","","Xohlagan savolingizni tanlang"));
+  box.append(el("p","muted","Qaysi savolni tanlasangiz, u hakamlarga ham shu zahoti ko'rinadi."));
+  (s.questions||[]).filter(q=>q.text!=null).forEach(q=>{
+    const b=el("button","qcard "+q.status+(q.status==="waiting"&&!hasCur?" pickable":""));
+    b.type="button";b.disabled=q.status!=="waiting";
+    b.append(el("span","n",q.ord),el("span","",q.text));
+    if(q.status==="done")b.append(el("span","badge ok","Baholandi"));
+    if(q.status==="waiting"&&!hasCur)b.onclick=()=>post("/api/tanlash",{id:q.id});
+    box.append(b);
+  });
+}
+load();setInterval(load,2000);
+</script>
+{% endblock %}

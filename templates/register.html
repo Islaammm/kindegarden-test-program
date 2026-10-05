@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Ro'yxatdan o'tish{% endblock %}
+{% block nav %}<a class="pill" href="{{ url_for('index') }}">Bosh sahifa</a>{% endblock %}
+{% block body %}
+<div class="grid2" style="align-items:center">
+  <div class="stack">
+    <h1 class="hero">Ro'yxatdan o'ting.</h1>
+    <p class="muted" style="font-size:18px;margin:0">Ism, familya, tug'ilgan sana va yo'nalish majburiy. Ro'yxatdan o'tgach, "Savol-javobni boshlash" tugmasi chiqadi.</p>
+  </div>
+  {% if not dirs %}
+  <div class="card stack">
+    <h2 style="font-size:24px">Hozircha yo'nalish yo'q</h2>
+    <p class="muted" style="margin:0">{% if has_any %}Yo'nalishlarda hali savol qo'shilmagan.{% else %}Adminda hali yo'nalish qo'shilmagan.{% endif %} Adminga murojaat qiling.</p>
+  </div>
+  {% else %}
+  <form class="card stack" method="post">
+    <h2 style="font-size:28px">Ishtirokchi ma'lumotlari</h2>
+    <div class="row" style="align-items:flex-start;flex-wrap:nowrap">
+      <div style="flex:1">
+        <label for="ism">Ism *</label>
+        <input id="ism" name="ism" value="{{ vals.ism }}" class="{{ 'invalid' if 'ism' in missing }}" autofocus>
+        {% if 'ism' in missing %}<div class="field-err">Ismni kiriting</div>{% endif %}
+      </div>
+      <div style="flex:1">
+        <label for="familya">Familya *</label>
+        <input id="familya" name="familya" value="{{ vals.familya }}" class="{{ 'invalid' if 'familya' in missing }}">
+        {% if 'familya' in missing %}<div class="field-err">Familyani kiriting</div>{% endif %}
+      </div>
+    </div>
+    <div>
+      <label for="tugilgan">Tug'ilgan sana *</label>
+      <input id="tugilgan" name="tugilgan" type="date" value="{{ vals.tugilgan }}" class="{{ 'invalid' if 'tugilgan' in missing }}">
+      {% if 'tugilgan' in missing %}<div class="field-err">Tug'ilgan sanani kiriting</div>{% endif %}
+    </div>
+    <div><label for="manzil">Yashash manzili (ixtiyoriy)</label><input id="manzil" name="manzil" value="{{ vals.manzil }}" placeholder="Viloyat, tuman"></div>
+    <div>
+      <label for="direction">Yo'nalish *</label>
+      <select id="direction" name="direction" class="{{ 'invalid' if 'direction' in missing }}">
+        <option value="">Yo'nalishni tanlang</option>
+        {% for d in dirs %}<option value="{{ d.id }}" {% if vals.direction == d.id|string %}selected{% endif %}>{{ d.name }}</option>{% endfor %}
+      </select>
+      {% if 'direction' in missing %}<div class="field-err">Yo'nalishni tanlang</div>{% endif %}
+    </div>
+    <button class="btn" type="submit">Ro'yxatdan o'tish</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

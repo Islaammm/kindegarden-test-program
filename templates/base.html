@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Savol javob{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true"><rect x="2" y="3" width="21" height="17" rx="5" stroke="#0E5A62" stroke-width="2.4"/><path d="M8 20v6l6-6" stroke="#0E5A62" stroke-width="2.4" stroke-linejoin="round"/><rect x="13" y="12" width="21" height="17" rx="5" fill="#0E5A62"/><path d="M24 20h5M19 20h2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+    Savol javob
+  </a>
+  <nav class="nav-wrap">{% block nav %}{% endblock %}</nav>
+</header>
+<main>
+{% with msgs = get_flashed_messages() %}{% for m in msgs %}<div class="flash" role="alert">{{ m }}</div>{% endfor %}{% endwith %}
+{% block body %}{% endblock %}
+</main>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script>
+function toggleEye(btn){var i=btn.parentElement.querySelector('input');var show=i.type==='password';
+i.type=show?'text':'password';btn.setAttribute('aria-pressed',show);btn.setAttribute('aria-label',show?"Yashirish":"Ko'rsatish");
+btn.querySelector('.slash').style.display=show?'':'none';i.focus();}
+
+// Sekin internetda tugma qayta-qayta bosilib, bitta forma ikki marta
+// yuborilib ketmasligi uchun: birinchi bosishda tugma darhol o'chadi.
+document.querySelectorAll("form").forEach(function(f){
+  f.addEventListener("submit", function(){
+    var btn = f.querySelector('button[type="submit"], input[type="submit"]');
+    if (btn && !btn.disabled) {
+      btn.disabled = true;
+      if (btn.tagName === "BUTTON") {
+        btn.dataset.origText = btn.textContent;
+        btn.textContent = "Yuborilmoqda…";
+      }
+      // Internet uzilib, hech qanday javob kelmasa ham, tugma abadiy
+      // o'chib qolmasin deb, 15 soniyadan keyin o'zi qayta yoqiladi.
+      setTimeout(function(){
+        btn.disabled = false;
+        if (btn.dataset.origText) btn.textContent = btn.dataset.origText;
+      }, 15000);
+    }
+  });
+});
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

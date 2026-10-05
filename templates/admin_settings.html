@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Sozlamalar{% endblock %}
+{% block nav %}{% include "_admin_nav.html" %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div><div class="eyebrow">Admin</div><h1 style="font-size:38px">Sozlamalar</h1></div>
+  <div class="grid2" style="align-items:start">
+    <div class="stack">
+      <form method="post" class="card stack">
+        <input type="hidden" name="form" value="general">
+        <h2 style="font-size:24px">Suhbat sozlamalari</h2>
+        <div><label for="nq">Har ishtirokchiga savollar soni</label><input id="nq" name="n_questions" type="number" min="1" max="50" value="{{ nq }}"></div>
+        <div><label for="mx">Har bir savol necha ball (hakamlar 1 dan shu ballgacha baholaydi)</label><input id="mx" name="max_score" type="number" min="1" max="10" value="{{ mx }}"></div>
+        <div class="muted" style="font-size:14px">Masalan 2 desangiz hakamlarda 1 va 2 ball tugmalari, 5 desangiz 1 dan 5 gacha tugmalar chiqadi. Jami ball ham shunga qarab hisoblanadi. Ball tizimi hali boshlanmagan suhbatlardan boshlab amal qiladi. Kod berishda savollar sonini har safar o'zgartirish ham mumkin.</div>
+        <button class="btn" type="submit">Saqlash</button>
+      </form>
+      <form method="post" class="card stack">
+        <input type="hidden" name="form" value="password">
+        <h2 style="font-size:24px">Admin parolini o'zgartirish</h2>
+        <div><label for="old">Joriy parol</label><div class="pw"><input id="old" name="old" type="password" required>{% include "_eye.html" %}</div></div>
+        <div><label for="new">Yangi parol</label><div class="pw"><input id="new" name="new" type="password" required minlength="4">{% include "_eye.html" %}</div></div>
+        <div><label for="new2">Yangi parolni takrorlang</label><div class="pw"><input id="new2" name="new2" type="password" required minlength="4">{% include "_eye.html" %}</div></div>
+        <button class="btn" type="submit">Parolni o'zgartirish</button>
+      </form>
+    </div>
+    <form method="post" class="card stack" onsubmit="return confirm('Barcha ishtirokchilar va natijalar o\'chiriladi. Davom etasizmi?')">
+      <input type="hidden" name="form" value="wipe">
+      <h2 style="font-size:24px">Yangi musobaqa</h2>
+      <div class="muted">Barcha ishtirokchilar va ularning natijalarini o'chiradi. Yo'nalishlar, savollar, hakamlar va parol qoladi.</div>
+      <button class="btn danger" type="submit">Natijalarni tozalash</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

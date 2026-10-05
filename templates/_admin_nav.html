@@ -1,0 +1,9 @@
+<a class="pill" href="{{ url_for('admin') }}">Boshqaruv</a>
+<a class="pill" href="{{ url_for('admin_directions') }}">Yo'nalishlar</a>
+<a class="pill" href="{{ url_for('admin_questions') }}">Savollar</a>
+<a class="pill" href="{{ url_for('admin_participants') }}">Ishtirokchilar</a>
+<a class="pill" href="{{ url_for('admin_judges') }}">Hakamlar</a>
+<a class="pill" href="{{ url_for('results_list') }}">Natijalar</a>
+<a class="pill" href="{{ url_for('admin_settings') }}">Sozlamalar</a>
+{% if not use_pg %}<a class="pill" href="{{ url_for('admin_supabase') }}">Supabase</a>{% endif %}
+<a class="pill" href="{{ url_for('logout') }}">Chiqish</a>

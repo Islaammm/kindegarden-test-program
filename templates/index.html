@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block nav %}<a class="pill" href="{{ url_for('admin_login') }}">Admin</a>{% endblock %}
+{% block body %}
+<div class="center stack" style="gap:24px">
+  <div class="stack" style="gap:14px">
+    <h1 class="hero">Nomzod bilan suhbat, aniq baholash.</h1>
+    <p class="muted" style="margin:0;font-size:18px">Ishtirokchi bo'lsangiz, ro'yxatdan o'ting. Hakam bo'lsangiz, admin bergan kodni kiriting.</p>
+  </div>
+  <div class="card stack">
+    <h2 style="font-size:26px">Ishtirokchi</h2>
+    <p class="muted" style="margin:0">Ism, familya, tug'ilgan sana va yo'nalishingizni tanlab ro'yxatdan o'ting, so'ng savol-javobni boshlaysiz.</p>
+    <a class="btn" href="{{ url_for('register') }}">Ro'yxatdan o'tish</a>
+  </div>
+  <form method="post" class="card stack">
+    <h2 style="font-size:26px">Hakam</h2>
+    <div><label for="code_j">Hakam kodi</label>
+    <div class="pw"><input id="code_j" name="code" type="password" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required style="height:60px;font-size:28px;letter-spacing:8px;text-align:center;font-family:Georgia,serif;padding-left:56px">{% include "_eye.html" %}</div></div>
+    <button class="btn ghost" type="submit">Hakam sifatida kirish</button>
+  </form>
+</div>
+{% endblock %}

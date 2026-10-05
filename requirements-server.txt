@@ -1,0 +1,7 @@
+# Bulutga (Render, Railway va h.k.) joylashtirish uchun — pywebview shart emas,
+# chunki u faqat kompyuterdagi dastur oynasi uchun kerak.
+flask>=3.0
+reportlab>=4.0
+requests>=2.30
+psycopg2-binary>=2.9
+gunicorn>=21.0

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block nav %}<a class="pill" href="/">Kod bilan kirish</a>{% endblock %}
+{% block body %}
+<div class="center stack">
+  <h1 style="font-size:40px">Admin kirishi</h1>
+  <form method="post" class="card stack">
+    <div><label for="password">Parol</label><div class="pw"><input id="password" name="password" type="password" required autofocus>{% include "_eye.html" %}</div></div>
+    <button class="btn" type="submit">Kirish</button>
+  </form>
+</div>
+{% endblock %}

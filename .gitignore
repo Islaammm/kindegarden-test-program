@@ -1,0 +1,25 @@
+# Maxfiy va lokal (kompyuterda yaraladigan) fayllar — repo'ga yuklanmasin
+.secret_key
+savol_javob_v3.db
+savol_javob_v3.db-journal
+natijalar/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Build / paket
+dist/
+build/
+*.exe
+*.spec
+
+# Railway / tahrirlovchi
+.railway/
+.vscode/
+.idea/
+.DS_Store

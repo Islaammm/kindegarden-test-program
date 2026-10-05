@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Supabase{% endblock %}
+{% block nav %}{% include "_admin_nav.html" %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div class="row" style="justify-content:space-between;align-items:flex-end;flex-wrap:wrap">
+    <div><div class="eyebrow">Admin</div><h1 style="font-size:38px">Supabase bilan sinxronlash</h1>
+      <div class="muted">Har ishtirokchi suhbatni tugatgach, natijasi avtomatik Supabase'ga yuboriladi. Savollar bankini ham shu yerdan yuklab olish yoki yuklash mumkin.</div></div>
+    <span class="badge {% if configured %}ok{% else %}wait{% endif %}">{% if configured %}Sozlangan{% else %}Sozlanmagan{% endif %}</span>
+  </div>
+
+  <form method="post" class="card stack">
+    <input type="hidden" name="form" value="save">
+    <h2 style="font-size:24px">Ulanish sozlamalari</h2>
+    <div><label for="url">Supabase loyiha URL manzili</label><input id="url" name="url" value="{{ url }}" placeholder="https://xxxxxxxx.supabase.co"></div>
+    <div><label for="key">Supabase maxfiy kaliti (Secret key)</label><div class="pw"><input id="key" name="key" type="password" value="{{ key }}">{% include "_eye.html" %}</div>
+      <div class="muted" style="font-size:14px">Supabase loyihangizda: Settings → API Keys → "Secret keys" bo'limi (eski loyihalarda "service_role" deb ataladi). "Publishable key" emas, aynan shu maxfiy kalitni oling. Bu kalitni hech kimga bermang.</div></div>
+    <div><label for="filial">Filial nomi (ixtiyoriy)</label><input id="filial" name="filial" value="{{ filial }}" placeholder="Masalan: Namangan filiali"></div>
+    <div class="muted" style="font-size:14px">Bir nechta kompyuter/filial bitta Supabase loyihasiga ulansa, natijalar qaysi filialdan kelganini shu nom bilan ajratasiz.</div>
+    <button class="btn" type="submit">Saqlash</button>
+  </form>
+
+  <div class="card row" style="justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div><h2 style="font-size:22px;margin:0 0 6px">Savollar banki</h2><div class="muted">Yo'nalish va savollarni Supabase bilan sinxronlang.</div></div>
+    <div class="row">
+      <form method="post"><input type="hidden" name="form" value="pull"><button class="btn ghost sm" type="submit" {% if not configured %}disabled{% endif %}>Supabase'dan yuklab olish</button></form>
+      <form method="post"><input type="hidden" name="form" value="push"><button class="btn ghost sm" type="submit" {% if not configured %}disabled{% endif %}>Mahalliy savollarni yuklash</button></form>
+    </div>
+  </div>
+
+  <div class="card stack">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="font-size:22px;margin:0">Yuborilmagan natijalar ({{ pending|length }})</h2>
+      {% if pending %}<form method="post"><input type="hidden" name="form" value="retry_all"><button class="btn sm" type="submit" {% if not configured %}disabled{% endif %}>Hammasini qayta yuborish</button></form>{% endif %}
+    </div>
+    {% for p in pending %}
+    <div class="row" style="justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)">
+      <span>{{ p.ism }} {{ p.familya }} <span class="muted">· {{ p.yonalish }} · {{ status_uz[p.status] }}</span></span>
+      <form method="post"><input type="hidden" name="form" value="retry"><input type="hidden" name="pid" value="{{ p.id }}"><button class="btn ghost sm" type="submit" {% if not configured %}disabled{% endif %}>Qayta yuborish</button></form>
+    </div>
+    {% else %}<p class="muted" style="margin:0">Hammasi yuborilgan.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

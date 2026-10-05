@@ -1,0 +1,12 @@
+# Railway'ga yuklanmasligi kerak bo'lgan kompyuterga xos fayllar.
+# Bulutda ma'lumotlar Postgres (DATABASE_URL) da saqlanadi — lokal SQLite va
+# maxfiy kalit yuborilmaydi.
+savol_javob_v3.db
+.secret_key
+natijalar/
+__pycache__/
+*.pyc
+.git/
+*.exe
+dist/
+build/

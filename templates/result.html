@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Natijalar{% endblock %}
+{% block nav %}{% if a.role == 'admin' %}{% include "_admin_nav.html" %}{% elif a.role == 'judge' %}<a class="pill" href="{{ url_for('judge') }}">Hakam paneli</a><a class="pill" href="{{ url_for('results_list') }}">Natijalar</a><a class="pill" href="{{ url_for('logout') }}">Chiqish</a>{% else %}<a class="pill" href="{{ url_for('logout') }}" {% if p.status in ('open','waiting') %}onclick="return confirm('Savol-javob oxiriga yetmadi. Chiqsangiz suhbat yopiladi. Chiqasizmi?')"{% endif %}>Chiqish</a>{% endif %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div class="row" style="justify-content:space-between;align-items:flex-end;flex-wrap:wrap">
+    <div><div class="eyebrow">Natijalar</div><h1 style="font-size:38px">{{ p.ism or '-' }} {{ p.familya or '' }}</h1>
+      <div class="muted">{{ p.tugilgan or '' }}{% if p.manzil %} · {{ p.manzil }}{% endif %}{% if p.yonalish %} · {{ p.yonalish }}{% endif %}</div></div>
+    <div class="row noprint"><a class="btn" href="{{ url_for('result_pdf', pid=p.id) }}">PDF yuklab olish</a><button class="btn ghost" onclick="window.print()">Chop etish</button></div>
+  </div>
+  <div class="row" style="gap:12px">
+    <div class="stat"><small>Yechilgan savollar</small><b>{{ r.answered }} / {{ r.n_q }}</b></div>
+    <div class="stat"><small>Jami to'plagan ball</small><b>{{ r.total }} / {{ r.max }}</b></div>
+    <div class="stat"><small>O'rtacha ball</small><b>{{ '%.2f'|format(r.overall) if r.overall is not none else '-' }} / {{ r.mx }}</b></div>
+  </div>
+  <div class="card" style="padding:20px 28px 12px;overflow-x:auto">
+    <table>
+      <tr><th class="l">Savol</th>{% for j in r.judges %}<th>Hakam {{ j.num }}<div style="font-weight:400;font-size:12px">{{ j.name }}</div></th>{% endfor %}<th>Jami</th><th style="color:var(--acc)">O'rtacha</th></tr>
+      {% for row in r.rows %}
+      <tr><td class="l" style="padding:8px 12px;min-width:200px"><b>{{ row.ord }}.</b> {{ row.text }}{% if row.answer and (a.role != 'candidate' or p.status in ('finished','closed')) %}<div class="muted" style="margin-top:4px;font-weight:400">To'g'ri javob: {{ row.answer }}</div>{% endif %}</td>{% for v in row.scores %}<td>{{ v if v is not none else '-' }}</td>{% endfor %}
+        <td>{{ row.sum }}</td><td class="avg">{{ '%.2f'|format(row.avg) if row.avg is not none else '-' }}</td></tr>
+      {% endfor %}
+      {% if r.judges %}
+      <tr class="total"><td class="l">Hakam bo'yicha jami ball</td>{% for v in r.judge_sum %}<td>{{ v }}</td>{% endfor %}<td>{{ r.total }}</td><td></td></tr>
+      <tr class="total"><td class="l">Hakam bo'yicha o'rtacha</td>{% for v in r.judge_avg %}<td>{{ '%.2f'|format(v) if v is not none else '-' }}</td>{% endfor %}<td></td><td class="avg">{{ '%.2f'|format(r.overall) if r.overall is not none else '-' }}</td></tr>
+      {% endif %}
+    </table>
+  </div>
+</div>
+{% endblock %}

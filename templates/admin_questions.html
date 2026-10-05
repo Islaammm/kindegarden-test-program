@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Savollar{% endblock %}
+{% block nav %}{% include "_admin_nav.html" %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div><div class="eyebrow">Admin</div><h1 style="font-size:38px">Savollar</h1></div>
+  {% if not dirs %}
+  <div class="card"><p style="margin:0">Avval yo'nalish qo'shing (masalan, Dasturlash yoki Matematika). <a class="btn sm" href="{{ url_for('admin_directions') }}" style="margin-left:12px">Yo'nalishlar menyusi</a></p></div>
+  {% else %}
+  <div class="card row" style="gap:24px;align-items:flex-end;flex-wrap:wrap">
+    <form method="get" style="flex:1;min-width:240px">
+      <label for="dsel">Yo'nalish (savol shu yo'nalishga qo'shiladi)</label>
+      <select id="dsel" name="d" onchange="this.form.submit()"><option value="">Yo'nalishni tanlang</option>{% for d in dirs %}<option value="{{ d.id }}" {% if flt == d.id %}selected{% endif %}>{{ d.name }}</option>{% endfor %}</select>
+    </form>
+    <form method="post" action="{{ url_for('admin_questions_order') }}" style="flex:1;min-width:240px">
+      <label for="order">Savollar qaysi tartibda chiqadi</label>
+      <select id="order" name="order" onchange="this.form.submit()"><option value="random" {% if order != 'sequential' %}selected{% endif %}>Tasodifiy (random)</option><option value="sequential" {% if order == 'sequential' %}selected{% endif %}>Ketma-ket (ro'yxat tartibida)</option></select>
+    </form>
+  </div>
+  <div class="grid2" style="align-items:start">
+    <form method="post" class="card stack">
+      <h2 style="font-size:24px">{% if eq %}Savolni tahrirlash{% else %}Yangi savol{% endif %}</h2>
+      <input type="hidden" name="direction" value="{{ flt or '' }}">
+      {% if eq %}<input type="hidden" name="qid" value="{{ eq.id }}">{% endif %}
+      {% if not flt %}<div class="flash" style="margin:0">Avval yuqoridan yo'nalishni tanlang.</div>{% endif %}
+      <div><label for="question">Savol</label><textarea id="question" name="question" rows="4" required {% if not flt %}disabled{% endif %}>{{ eq.text if eq else '' }}</textarea></div>
+      <div><label for="answer">Javob</label><textarea id="answer" name="answer" rows="4" {% if not flt %}disabled{% endif %}>{{ eq.answer if eq else '' }}</textarea></div>
+      <div class="muted" style="font-size:14px">Javob hakamlarga ko'rinadi (ishtirokchiga ko'rinmaydi). Qo'shgach forma tozalanadi, yo'nalish saqlanadi.</div>
+      <div class="row"><button class="btn" type="submit" {% if not flt %}disabled{% endif %}>{% if eq %}Saqlash{% else %}Savol va javobni qo'shish{% endif %}</button>
+        {% if eq %}<a class="btn ghost" href="{{ url_for('admin_questions', d=flt) }}">Bekor qilish</a>{% endif %}</div>
+    </form>
+    <div class="card" style="padding:16px 24px">
+      <div class="eyebrow" style="margin-bottom:6px">{% if flt %}Shu yo'nalishdagi savollar ({{ items|length }}){% else %}Barcha savollar ({{ items|length }}){% endif %}</div>
+      {% set ns = namespace(last=None) %}
+      {% for it in items %}
+      {% if not flt and it.dname != ns.last %}{% set ns.last = it.dname %}<div class="eyebrow" style="margin:14px 0 4px;color:var(--mut)">{{ it.dname or 'Yo\'nalishsiz' }}</div>{% endif %}
+      <div style="padding:12px 0;border-bottom:1px solid var(--line)">
+        <div><b>{{ loop.index }}.</b> {{ it.text }}</div>
+        <div class="muted" style="margin:4px 0 8px">Javob: {{ it.answer if it.answer else '—' }}</div>
+        <div class="row">
+          <a class="btn ghost sm" href="{{ url_for('admin_questions', edit=it.id) }}">Tahrirlash</a>
+          <form method="post" action="{{ url_for('admin_question_delete', qid=it.id) }}" onsubmit="return confirm('Savol o\'chirilsinmi?')"><button class="btn danger sm" type="submit">O'chirish</button></form>
+        </div>
+      </div>
+      {% else %}<p class="muted">Bu yerda savol yo'q.</p>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

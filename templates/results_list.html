@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Natijalar{% endblock %}
+{% block nav %}{% if a.role == 'admin' %}{% include "_admin_nav.html" %}{% else %}<a class="pill" href="{{ url_for('judge') }}">Hakam paneli</a><a class="pill" href="{{ url_for('logout') }}">Chiqish</a>{% endif %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div class="row" style="justify-content:space-between;align-items:flex-end;flex-wrap:wrap">
+    <div><div class="eyebrow">Natijalar</div><h1 style="font-size:38px">Ishtirokchilar reytingi</h1></div>
+    <div class="row noprint"><a class="btn sm" href="{{ url_for('results_list_pdf') }}">PDF yuklab olish</a></div>
+  </div>
+  <div class="card" style="padding:16px 28px;overflow-x:auto">
+    <table>
+      <tr><th class="l">O'rin</th><th class="l">Ishtirokchi</th><th class="l">Yo'nalish</th><th>Yechilgan</th><th>Jami ball</th><th style="color:var(--acc)">O'rtacha</th><th></th></tr>
+      {% for x in items %}{% set p = x.p %}{% set r = x.r %}
+      <tr><td class="l">{{ loop.index }}</td><td class="l"><b>{{ p.ism }} {{ p.familya }}</b></td><td class="l">{{ p.yonalish }}</td>
+        <td>{{ r.answered }} / {{ r.n_q }}</td><td>{{ r.total }} / {{ r.max }}</td>
+        <td class="avg">{{ '%.2f'|format(x.overall) if x.overall is not none else '-' }}</td>
+        <td><a class="btn ghost sm" href="{{ url_for('result_page', pid=p.id) }}">Ochish</a></td></tr>
+      {% else %}<tr><td colspan="7" class="l muted">Hali natija yo'q.</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

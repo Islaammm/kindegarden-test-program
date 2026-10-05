@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Hakamlar{% endblock %}
+{% block nav %}{% include "_admin_nav.html" %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div><div class="eyebrow">Admin</div><h1 style="font-size:38px">Hakamlar</h1>
+    <div class="muted">Hakam qo'shsangiz, unga 6 xonali kod avtomatik beriladi. Hakam bir marta kirib, siz o'chirmaguncha ulanib turadi.</div></div>
+  <form method="post" class="card stack">
+    <h2 style="font-size:24px">Yangi hakam qo'shish</h2>
+    <div class="row" style="align-items:flex-end;flex-wrap:wrap">
+      <div style="width:110px"><label for="num">Raqami</label><input id="num" name="num" type="number" min="1" value="{{ next_num }}" required></div>
+      <div style="flex:1;min-width:160px"><label for="ism">Ism</label><input id="ism" name="ism" required></div>
+      <div style="flex:1;min-width:160px"><label for="fam">Familya</label><input id="fam" name="familya" required></div>
+      <div style="width:190px"><label for="tug">Tug'ilgan sana (ixtiyoriy)</label><input id="tug" name="tugilgan" type="date"></div>
+      <button class="btn" type="submit">Qo'shish</button>
+    </div>
+  </form>
+  <div class="card" style="padding:12px 28px">
+    {% for x in rows %}{% set j = x.j %}
+    <div class="row" style="justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);flex-wrap:wrap">
+      <div style="min-width:200px"><b>Hakam {{ j.num }}</b><div>{{ j.ism }} {{ j.familya }}</div>{% if j.tugilgan %}<div class="muted" style="font-size:14px">{{ j.tugilgan }}</div>{% endif %}</div>
+      <span class="code">{{ j.code }}</span>
+      <span class="badge {% if x.online %}ok{% else %}wait{% endif %}">{% if x.online %}Ulangan{% else %}Ulanmagan{% endif %}</span>
+      <div class="row">
+        <form method="post" action="{{ url_for('admin_judge_renew', jid=j.id) }}" onsubmit="return confirm('Hakam {{ j.num }} chiqarib yuboriladi va unga yangi kod beriladi. Davom etasizmi?')"><button class="btn ghost sm" type="submit">Yangi kod</button></form>
+        <form method="post" action="{{ url_for('admin_judge_delete', jid=j.id) }}" onsubmit="return confirm('Hakam {{ j.num }} o\'chiriladi. Davom etasizmi?')"><button class="btn danger sm" type="submit">O'chirish</button></form>
+      </div>
+    </div>
+    {% else %}<p class="muted">Hali hakam yo'q. Yuqoridan qo'shing.</p>{% endfor %}
+  </div>
+  <div class="muted" style="font-size:14px">"Yangi kod" hakamning eski kodini bekor qiladi (uni tizimdan chiqarib yuboradi). O'chirilgan hakamning oldingi ballari natijalarda saqlanadi.</div>
+</div>
+{% endblock %}

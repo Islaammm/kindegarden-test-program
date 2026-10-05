@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Boshqaruv{% endblock %}
+{% block nav %}{% include "_admin_nav.html" %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  {% if link %}
+  <div class="card" style="background:var(--tint);border:1px solid var(--acc)">
+    <div style="font-weight:600;margin-bottom:6px">Hakamlar va ishtirokchi shu manzilni o'z brauzerida ochadi (bir Wi-Fi/tarmoqda bo'lishi kerak):</div>
+    <div class="code" style="font-size:22px;letter-spacing:0;user-select:all">{{ link }}</div>
+  </div>
+  {% endif %}
+  <div class="row" style="justify-content:space-between;flex-wrap:wrap">
+    <div><div class="eyebrow">Boshqaruv</div><h1 style="font-size:36px" id="who">Hozir javob berayotgan ishtirokchi yo'q</h1><div class="muted" id="sub"></div></div>
+    <div class="row"><span id="st" class="badge wait">Kutilmoqda</span><a class="btn sm" href="{{ url_for('admin_participants') }}">Ishtirokchilar</a></div>
+  </div>
+  <div class="grid2" style="align-items:start">
+    <div class="card stack" style="gap:14px">
+      <h2 style="font-size:24px">Joriy savol</h2>
+      <div id="cur" class="muted">Savol tanlanmagan.</div>
+      <div id="ans" class="answer" hidden></div>
+      <div id="judges" class="row" style="flex-wrap:wrap;gap:10px"></div>
+      <div class="row">
+        <form method="post" action="{{ url_for('admin_force') }}" id="force" hidden><button class="btn ghost sm" type="submit">Savolni baholarsiz yakunlash</button></form>
+      </div>
+    </div>
+    <div class="card stack" style="gap:10px">
+      <h2 style="font-size:24px">Ishtirokchi savollari</h2>
+      <div id="qs" class="stack" style="gap:8px"><span class="muted">Suhbat hali boshlanmagan.</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load(){
+  const s=await (await api("/api/holat")).json();
+  const p=s.participant;
+  $("who").textContent=p?p.ism+" "+p.familya:"Hozir javob berayotgan ishtirokchi yo'q";
+  $("sub").textContent=p?(p.yonalish||""):(s.waiting?("Navbatda: "+s.waiting+" ta. Keyingisi: "+s.next):"Navbat bo'sh. Ishtirokchilar kod bilan kirishini kuting.");
+  const st=$("st");st.className="badge wait";st.textContent=p?"Jarayonda":"Kutilmoqda";
+  const qs=$("qs");qs.replaceChildren();
+  (s.questions||[]).forEach(q=>{const r=el("div","row");r.style.justifyContent="space-between";r.append(el("span","",q.ord+". "+(q.text||"")),el("span","badge "+(q.status==="done"?"ok":"wait"),q.status==="done"?"Baholandi":q.status==="current"?"Baholanmoqda":"Kutmoqda"));qs.append(r)});
+  if(!(s.questions||[]).length)qs.append(el("span","muted","Suhbat hali boshlanmagan."));
+  const j=$("judges");j.replaceChildren();
+  if(s.current){$("cur").textContent="Savol "+s.current.ord+": "+s.current.text;$("cur").className="";
+    $("ans").hidden=!s.current.answer;$("ans").textContent="To'g'ri javob: "+(s.current.answer||"");
+    (s.judges||[]).forEach(x=>{if(x.removed&&x.ball==null)return;j.append(el("span","badge "+(x.ball!=null?"ok":"wait"),"Hakam "+x.num+" ("+x.name+"): "+(x.ball!=null?x.ball:(x.online?"kutilmoqda":"ulanmagan"))))});
+    $("force").hidden=false}
+  else{$("cur").textContent="Savol tanlanmagan.";$("cur").className="muted";$("force").hidden=true;$("ans").hidden=true}
+}
+load();setInterval(load,2000);
+</script>
+{% endblock %}

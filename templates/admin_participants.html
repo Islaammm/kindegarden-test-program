@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Ishtirokchilar{% endblock %}
+{% block nav %}{% include "_admin_nav.html" %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div><div class="eyebrow">Admin</div><h1 style="font-size:38px">Ishtirokchilar</h1>
+    <div class="muted">Ishtirokchilar o'zlari ro'yxatdan o'tadi: ism, familya, tug'ilgan sana va yo'nalishni tanlab, "Ro'yxatdan o'tish" sahifasidan kiradilar. Kod kerak emas.</div></div>
+  <div class="card" style="padding:16px 28px;overflow-x:auto">
+    <table>
+      <tr><th class="l">№</th><th class="l">Ishtirokchi</th><th class="l">Yo'nalish</th><th>Holat</th><th>Yechgani</th><th>Ball</th><th></th></tr>
+      {% for x in items %}{% set p = x.p %}{% set r = x.r %}
+      <tr><td class="l">{{ p.id }}</td>
+        <td class="l"><b>{{ p.ism }} {{ p.familya }}</b></td>
+        <td class="l">{{ p.yonalish or '-' }}</td>
+        <td><span class="badge {% if p.status == 'finished' %}ok{% else %}wait{% endif %}">{{ status_uz[p.status] }}</span></td>
+        <td>{{ r.answered }} / {{ r.n_q }}</td>
+        <td>{% if r.total or r.answered %}{{ r.total }} / {{ r.max }}{% else %}-{% endif %}</td>
+        <td><button class="dots" type="button" aria-label="Ishtirokchi haqida ma'lumot" onclick="showP({{ p.id }})"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></td></tr>
+      {% else %}<tr><td colspan="7" class="l muted">Hali ishtirokchi yo'q.</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+<dialog id="pdlg"><div class="dlg-head"><button type="button" class="btn ghost sm" onclick="document.getElementById('pdlg').close()">Yopish</button></div><div class="dlg-body" id="pbody"></div></dialog>
+{% endblock %}
+{% block scripts %}
+<script>
+async function showP(id){
+  const r=await fetch("/admin/ishtirokchilar/"+id+"/panel");
+  if(!r.ok){alert("Ma'lumotni ochib bo'lmadi");return}
+  document.getElementById("pbody").innerHTML=await r.text();
+  document.getElementById("pdlg").showModal();
+}
+</script>
+{% endblock %}

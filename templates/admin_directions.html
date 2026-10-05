@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Yo'nalishlar{% endblock %}
+{% block nav %}{% include "_admin_nav.html" %}{% endblock %}
+{% block body %}
+<div class="stack" style="gap:24px">
+  <div><div class="eyebrow">Admin</div><h1 style="font-size:38px">Yo'nalishlar</h1><div class="muted">Masalan: Dasturlash, Matematika. Qo'shilgan yo'nalishlar "Savollar" menyusida tanlash uchun chiqadi.</div></div>
+  <div class="grid2" style="align-items:start">
+    <form method="post" class="card stack">
+      <div><label for="name">Yo'nalish nomi</label><input id="name" name="name" placeholder="Masalan: Dasturlash" required autofocus></div>
+      <button class="btn" type="submit">Yo'nalish qo'shish</button>
+    </form>
+    <div class="card" style="padding:16px 24px">
+      {% for d in items %}
+      <div class="row" style="justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)">
+        <div><b>{{ d.name }}</b><div class="muted" style="font-size:14px">{{ d.n }} ta savol</div></div>
+        <div class="row">
+          <a class="btn ghost sm" href="{{ url_for('admin_questions', d=d.id) }}">Savollar</a>
+          <form method="post" action="{{ url_for('admin_direction_delete', did=d.id) }}" onsubmit="return confirm('Yo\'nalish va uning {{ d.n }} ta savoli o\'chiriladi. Davom etasizmi?')"><button class="btn danger sm" type="submit">O'chirish</button></form>
+        </div>
+      </div>
+      {% else %}<p class="muted">Hali yo'nalish yo'q. Chapdan qo'shing.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

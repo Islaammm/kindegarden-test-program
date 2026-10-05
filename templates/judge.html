@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Hakam {{ num }}{% endblock %}
+{% block nav %}<a class="pill" href="{{ url_for('results_list') }}">Natijalar</a><a class="pill" href="{{ url_for('logout') }}">Chiqish</a>{% endblock %}
+{% block body %}
+<div class="grid2" style="grid-template-columns:1.6fr 1fr;align-items:start">
+  <div class="stack" style="gap:22px">
+    <div class="row" style="justify-content:space-between;flex-wrap:wrap">
+      <div><div class="eyebrow">Hakam paneli</div><h1 style="font-size:34px">Hakam {{ num }}</h1><div class="muted">{{ name }}</div></div>
+      <div id="cand" style="text-align:right"></div>
+    </div>
+    <div class="card stack" id="main" style="gap:28px"></div>
+  </div>
+  <div class="card stack" style="gap:6px">
+    <h2 style="font-size:24px;margin-bottom:8px">Sizning baholaringiz</h2>
+    <div id="my"><span class="muted">Hali savol yo'q.</span></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load(){
+  const s=await (await api("/api/holat")).json();
+  const cand=$("cand");cand.replaceChildren();
+  const p=s.participant;
+  if(p){cand.append(el("div","",p.ism+" "+p.familya));const y=el("div","muted",p.yonalish);y.style.fontSize="14px";cand.append(y)}
+  const my=$("my");my.replaceChildren();
+  (s.my||[]).forEach(m=>{const row=el("div","row");row.style.cssText="justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line)";row.append(el("span","","Savol "+m.ord),el("b","",m.ball==null?"-":m.ball));my.append(row)});
+  if(!(s.my||[]).length)my.append(el("span","muted","Hali savol yo'q."));
+  const box=$("main");
+  if(s.current){if(renderScoring(box,s,true,load))return}
+  box.replaceChildren();
+  if(!p){box.append(el("h2","","Ishtirokchi kutilmoqda"),el("p","muted","Ishtirokchi suhbatni boshlaganda savol shu yerda paydo bo'ladi. Siz ulanib turasiz."+(s.next?" Navbatdagi: "+s.next+".":"")));
+    if(s.last){const a=el("a","btn ghost sm","Oxirgi ishtirokchi natijasi");a.href="/natija/"+s.last;box.append(a)}return}
+  if(s.finished){box.append(el("h2","","Suhbat yakunlandi"));const a=el("a","btn","Natijani ko'rish");a.href="/natija/"+p.id;box.append(a);return}
+  box.append(el("h2","","Keyingi savol kutilmoqda"),el("p","muted","Ishtirokchi keyingi savolga o'tgach, u shu yerda ko'rinadi."));
+}
+load();setInterval(load,2000);
+</script>
+{% endblock %}

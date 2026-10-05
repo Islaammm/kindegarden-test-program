@@ -1,0 +1,38 @@
+<div class="stack" style="gap:20px">
+  <div class="row" style="justify-content:space-between;flex-wrap:wrap">
+    <div><div class="eyebrow">Ishtirokchi</div>
+      <h2 style="font-size:32px">{% if p.registered %}{{ p.ism }} {{ p.familya }}{% else %}Ro'yxatdan o'tmagan{% endif %}</h2></div>
+    <span class="badge {% if p.status == 'finished' %}ok{% else %}wait{% endif %}">{{ status_uz[p.status] }}</span>
+  </div>
+  <dl class="kv">
+    <dt>Tug'ilgan sana</dt><dd>{{ p.tugilgan or '-' }}</dd>
+    <dt>Manzil</dt><dd>{{ p.manzil or '-' }}</dd>
+    <dt>Yo'nalish</dt><dd>{{ p.yonalish or '-' }}</dd>
+    <dt>Ro'yxatdan o'tgan</dt><dd>{{ p.created_at }}</dd>
+  </dl>
+  <div class="row" style="gap:12px">
+    <div class="stat"><small>Yechilgan savollar</small><b>{{ r.answered }} / {{ r.n_q }}</b></div>
+    <div class="stat"><small>Jami ball</small><b>{{ r.total }} / {{ r.max }}</b></div>
+    <div class="stat"><small>O'rtacha ball</small><b>{{ '%.2f'|format(r.overall) if r.overall is not none else '-' }} / {{ r.mx }}</b></div>
+  </div>
+  <div style="overflow-x:auto">
+  <table>
+    <tr><th class="l">Savol</th>{% for j in r.judges %}<th>Hakam {{ j.num }}<div style="font-weight:400;font-size:12px">{{ j.name }}</div></th>{% endfor %}<th>Jami</th><th style="color:var(--acc)">O'rtacha</th></tr>
+    {% for row in r.rows %}
+    <tr><td class="l" style="min-width:180px;padding:8px 12px"><b>{{ row.ord }}.</b> {{ row.text }}</td>
+      {% for v in row.scores %}<td>{{ v if v is not none else '-' }}</td>{% endfor %}
+      <td>{{ row.sum }}</td><td class="avg">{{ '%.2f'|format(row.avg) if row.avg is not none else '-' }}</td></tr>
+    {% else %}<tr><td colspan="9" class="l muted">Savollar biriktirilmagan.</td></tr>{% endfor %}
+    {% if r.judges %}
+    <tr class="total"><td class="l">Hakam bo'yicha jami</td>{% for v in r.judge_sum %}<td>{{ v }}</td>{% endfor %}<td>{{ r.total }}</td><td></td></tr>
+    <tr class="total"><td class="l">Hakam bo'yicha o'rtacha</td>{% for v in r.judge_avg %}<td>{{ '%.2f'|format(v) if v is not none else '-' }}</td>{% endfor %}<td></td><td class="avg">{{ '%.2f'|format(r.overall) if r.overall is not none else '-' }}</td></tr>
+    {% endif %}
+  </table>
+  </div>
+  {% if not r.judges %}<div class="muted">Suhbat hali boshlanmagan.</div>{% endif %}
+  <div class="row" style="flex-wrap:wrap">
+    {% if p.status in ('open', 'finished', 'closed') %}<a class="btn" href="{{ url_for('result_pdf', pid=p.id) }}">PDF yuklab olish</a>{% endif %}
+    {% if p.status == 'open' %}<form method="post" action="{{ url_for('admin_participant_close', pid=p.id) }}" onsubmit="return confirm('Joriy suhbat yopiladi. Davom etasizmi?')"><button class="btn ghost" type="submit">Suhbatni yopish</button></form>{% endif %}
+    <form method="post" action="{{ url_for('admin_participant_delete', pid=p.id) }}" onsubmit="return confirm('Ishtirokchi va uning natijalari o\'chiriladi. Davom etasizmi?')"><button class="btn danger" type="submit">O'chirish</button></form>
+  </div>
+</div>
